@@ -6,23 +6,33 @@ import (
 	"reflect"
 )
 
+// QueryConfig defines the arguments in a OpaqueCursor call.
+type QueryConfig struct {
+	SQL   squirrel.SelectBuilder
+	ID    string
+	First int
+	After string
+}
+
 // OpaqueCursor applies pagination in a regular query.
-func OpaqueCursor(builder squirrel.SelectBuilder, fieldID string, first int, after string) (result *squirrel.SelectBuilder, pageSize int, err error) {
-	if first == 0 {
+func OpaqueCursor(params QueryConfig) (result *squirrel.SelectBuilder, pageSize int, err error) {
+	var builder squirrel.SelectBuilder
+
+	if params.First == 0 {
 		// pass
-	} else if first < 1 {
+	} else if params.First < 1 {
 		return nil, 0, errors.New("the 'first' argument cannot be less than 1")
 	} else {
 		// add 1 more element (for hasNextPage)
-		pageSize = first + 1
-		builder = builder.Limit(uint64(pageSize))
+		pageSize = params.First + 1
+		builder = params.SQL.Limit(uint64(pageSize))
 	}
-	if after != "" {
-		cursor, err := ParseCursor(after)
+	if params.After != "" {
+		cursor, err := ParseCursor(params.After)
 		if err != nil {
 			return nil, 0, err
 		}
-		builder = builder.Where(fieldID+" < ?", cursor)
+		builder = params.SQL.Where(params.ID+" < ?", cursor)
 	}
 
 	return &builder, pageSize, nil
