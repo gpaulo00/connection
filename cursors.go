@@ -30,3 +30,11 @@ func CreateCursor(id string) string {
 	cursor := []byte(cursorPrefix + ":" + id)
 	return base64.URLEncoding.EncodeToString(cursor)
 }
+
+// CreateEdge creates an edge of connection from a node.
+func CreateEdge(node interface{}, id string) *Edge {
+	return &Edge{
+		Node:   node,
+		Cursor: CreateCursor(id),
+	}
+}

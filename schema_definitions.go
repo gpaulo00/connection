@@ -32,9 +32,9 @@ var ConnectionArguments = graphql.FieldConfigArgument{
 }
 
 // GenerateConnectionSchema create the GraphQL definition for the connection.
-func GenerateConnectionSchema(name string, nodeType graphql.Type) (connectionType graphql.Type) {
+func GenerateConnectionSchema(name string, nodeType graphql.Type) (connectionType graphql.Type, edgeType graphql.Type) {
 	// create edge
-	edgeType := graphql.NewObject(graphql.ObjectConfig{
+	edgeType = graphql.NewObject(graphql.ObjectConfig{
 		Name: name + "Edge",
 		Fields: graphql.Fields{
 			"cursor": &graphql.Field{
