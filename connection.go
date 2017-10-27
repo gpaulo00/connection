@@ -2,6 +2,7 @@ package connection
 
 import (
 	"errors"
+	"fmt"
 	"github.com/Masterminds/squirrel"
 	"reflect"
 )
@@ -16,7 +17,7 @@ type QueryConfig struct {
 
 // OpaqueCursor applies pagination in a regular query.
 func OpaqueCursor(params QueryConfig) (result *squirrel.SelectBuilder, pageSize int, err error) {
-	var builder squirrel.SelectBuilder
+	builder := params.SQL
 
 	if params.First == 0 {
 		// pass
@@ -25,14 +26,14 @@ func OpaqueCursor(params QueryConfig) (result *squirrel.SelectBuilder, pageSize 
 	} else {
 		// add 1 more element (for hasNextPage)
 		pageSize = params.First + 1
-		builder = params.SQL.Limit(uint64(pageSize))
+		builder = builder.Limit(uint64(pageSize))
 	}
 	if params.After != "" {
 		cursor, err := ParseCursor(params.After)
 		if err != nil {
 			return nil, 0, err
 		}
-		builder = params.SQL.Where(params.ID+" < ?", cursor)
+		builder = builder.Where(params.ID+" < ?", cursor)
 	}
 
 	return &builder, pageSize, nil
@@ -66,7 +67,7 @@ func BuildConnection(nodes interface{}, pageSize int) (*Connection, error) {
 		// create edge
 		result.Edges = append(result.Edges, Edge{
 			Node:   node,
-			Cursor: CreateCursor(id.String()),
+			Cursor: CreateCursor(fmt.Sprintf("%v", id.Interface())),
 		})
 	}
 

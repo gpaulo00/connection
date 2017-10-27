@@ -21,6 +21,16 @@ var PageInfoType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+// ConnectionArguments describes the arguments that must have the connections.
+var ConnectionArguments = graphql.FieldConfigArgument{
+	"first": &graphql.ArgumentConfig{
+		Type: graphql.Int,
+	},
+	"after": &graphql.ArgumentConfig{
+		Type: graphql.String,
+	},
+}
+
 // GenerateConnectionSchema create the GraphQL definition for the connection.
 func GenerateConnectionSchema(name string, nodeType graphql.Type) (connectionType graphql.Type) {
 	// create edge
