@@ -35,7 +35,12 @@ import (
 func ImagesResolver(params graphql.ResolveParams) (interface{}, error) {
   // select only first 10 images after "XYZ"
   builder := sq.Select("*").From("images")
-  builder, pageSize, err := conn.OpaqueCursor(builder, 10, "XYZ")
+  builder, pageSize, err := conn.OpaqueCursor(conn.QueryConfig{
+    SQL: builder,
+    ID: "image_id",
+    First: 10,
+    After: "XYZ",
+  })
   if err != nil {
     return nil, err
   }

@@ -13,11 +13,24 @@ type QueryConfig struct {
 	ID    string
 	First int
 	After string
+	Order int
 }
 
 // OpaqueCursor applies pagination in a regular query.
 func OpaqueCursor(params QueryConfig) (result *squirrel.SelectBuilder, pageSize int, err error) {
 	builder := params.SQL
+	var (
+		orderSQL string
+		whereSQL string
+	)
+
+	if params.Order >= 0 {
+		orderSQL = params.ID + " ASC"
+		whereSQL = "> ?"
+	} else {
+		orderSQL = params.ID + " DESC"
+		whereSQL = "< ?"
+	}
 
 	if params.First == 0 {
 		// pass
@@ -26,14 +39,14 @@ func OpaqueCursor(params QueryConfig) (result *squirrel.SelectBuilder, pageSize 
 	} else {
 		// add 1 more element (for hasNextPage)
 		pageSize = params.First + 1
-		builder = builder.Limit(uint64(pageSize))
+		builder = builder.Limit(uint64(pageSize)).OrderBy(orderSQL)
 	}
 	if params.After != "" {
 		cursor, err := ParseCursor(params.After)
 		if err != nil {
 			return nil, 0, err
 		}
-		builder = builder.Where(params.ID+" < ?", cursor)
+		builder = builder.Where(params.ID+whereSQL, cursor)
 	}
 
 	return &builder, pageSize, nil
