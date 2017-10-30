@@ -23,10 +23,10 @@ func OpaqueCursor(params QueryConfig) (result *squirrel.SelectBuilder, pageSize 
 
 	if params.Order >= 0 {
 		builder = builder.OrderBy(params.ID + " ASC")
-		whereSQL = "> ?"
+		whereSQL = " > ?"
 	} else {
 		builder = builder.OrderBy(params.ID + " DESC")
-		whereSQL = "< ?"
+		whereSQL = " < ?"
 	}
 
 	if params.First == 0 {
