@@ -10,13 +10,16 @@ var PageInfoType = graphql.NewObject(graphql.ObjectConfig{
 	Description: "Information about pagination in a connection.",
 	Fields: graphql.Fields{
 		"endCursor": &graphql.Field{
-			Type: graphql.String,
+			Type:        graphql.String,
+			Description: "The last cursor in the page.",
 		},
 		"startCursor": &graphql.Field{
-			Type: graphql.String,
+			Type:        graphql.String,
+			Description: "The first cursor in the page",
 		},
 		"hasNextPage": &graphql.Field{
-			Type: graphql.NewNonNull(graphql.Boolean),
+			Type:        graphql.NewNonNull(graphql.Boolean),
+			Description: "Are there more items?",
 		},
 	},
 })
@@ -24,10 +27,12 @@ var PageInfoType = graphql.NewObject(graphql.ObjectConfig{
 // ConnectionArguments describes the arguments that must have the connections.
 var ConnectionArguments = graphql.FieldConfigArgument{
 	"first": &graphql.ArgumentConfig{
-		Type: graphql.Int,
+		Type:        graphql.Int,
+		Description: "Returns the first *n* elements from the list.",
 	},
 	"after": &graphql.ArgumentConfig{
-		Type: graphql.String,
+		Type:        graphql.String,
+		Description: "Returns the elements in the list that come after the specified cursor.",
 	},
 }
 
@@ -38,10 +43,12 @@ func GenerateConnectionSchema(name string, nodeType graphql.Type) (connectionTyp
 		Name: name + "Edge",
 		Fields: graphql.Fields{
 			"cursor": &graphql.Field{
-				Type: graphql.NewNonNull(graphql.String),
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "A cursor for use in pagination.",
 			},
 			"node": &graphql.Field{
-				Type: graphql.NewNonNull(nodeType),
+				Type:        graphql.NewNonNull(nodeType),
+				Description: "The item at the end of the edge.",
 			},
 		},
 	})
@@ -51,10 +58,12 @@ func GenerateConnectionSchema(name string, nodeType graphql.Type) (connectionTyp
 		Name: name + "Connection",
 		Fields: graphql.Fields{
 			"edges": &graphql.Field{
-				Type: graphql.NewNonNull(graphql.NewList(edgeType)),
+				Type:        graphql.NewNonNull(graphql.NewList(edgeType)),
+				Description: "A list of edges.",
 			},
 			"pageInfo": &graphql.Field{
-				Type: graphql.NewNonNull(PageInfoType),
+				Type:        graphql.NewNonNull(PageInfoType),
+				Description: "Information to aid in pagination.",
 			},
 		},
 	})
